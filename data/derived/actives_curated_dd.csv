@@ -1,0 +1,10 @@
+variable,name,variable_type,description
+doc_id,NA,integer,NA
+text,NA,character,NA
+lang,NA,character,NA
+country,NA,character,NA
+year,NA,integer,NA
+title,NA,character,NA
+type,NA,character,NA
+genre,NA,character,NA
+imdbid,NA,integer,NA

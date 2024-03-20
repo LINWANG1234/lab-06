@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Lin Wang">
+
+<title>Lab 06: Taming data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="2_curate_files/libs/clipboard/clipboard.min.js"></script>
+<script src="2_curate_files/libs/quarto-html/quarto.js"></script>
+<script src="2_curate_files/libs/quarto-html/popper.min.js"></script>
+<script src="2_curate_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="2_curate_files/libs/quarto-html/anchor.min.js"></script>
+<link href="2_curate_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="2_curate_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="2_curate_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="2_curate_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="2_curate_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 06: Taming data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Lin Wang </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)        <span class="co"># data manipulation</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)        <span class="co"># dynamic report generation</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readtext)     <span class="co"># text data import</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)        <span class="co"># efficient data reading</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qtalrkit)     <span class="co"># document the dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<!--
+
+- Overview of the data source and the purpose of this script
+
+-->
+<section id="description" class="level3">
+<h3 class="anchored" data-anchor-id="description">Description</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"../data/original/actives_do.csv"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tbl-data-origin-file" class="anchored">
+<table data-quarto-postprocess="true" data-tbl-colwidths="[30,70]" class="table table-sm table-striped small">
+<caption>Table&nbsp;1: Data origin: Actives corpus</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">attribute</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Resource name</td>
+<td style="text-align: left;">ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican and Spanish productions (v.02)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Data source</td>
+<td style="text-align: left;">URL: https://github.com/francojc/activ-es and DOI: 10.5281/zenodo.1492613</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Data sampling frame</td>
+<td style="text-align: left;">Spanish-language TV-film transcripts from Argentina, Mexico, and Spain</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Data collection date(s)</td>
+<td style="text-align: left;">1940s-2010s</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Data format</td>
+<td style="text-align: left;">Running text files (.run), Part of Speech tagged files (.pos), and EAGLES tagged files (.eagles)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Data schema</td>
+<td style="text-align: left;">File names reflect: language code, country, year, title, type, genre (first genre listed in the IMDb), and IMDb ID</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">License</td>
+<td style="text-align: left;">GNU General Public License v2.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Attribution</td>
+<td style="text-align: left;">Jerid Francom. (2018). ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican and Spanish productions (activ-es-v.02) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.1492613</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+<ul>
+<li>the name of the data:</li>
+</ul>
+<p>“ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican and Spanish productions (v.02)”</p>
+<ul>
+<li>the source of the data:</li>
+</ul>
+<p>“URL: https://github.com/francojc/activ-es and DOI: 10.5281/zenodo.1492613”</p>
+<ul>
+<li>the nature of the data:</li>
+</ul>
+<p>Sampling frame is “Spanish-language TV-film transcripts from Argentina, Mexico, and Spain”, data collection dates are “1940s-2010s”</p>
+<ul>
+<li>the acquisition strategy that was used:</li>
+</ul>
+<p>It involves downloading the data from the provided URL:(https://github.com/francojc/activ-es) and Zenodo DOI (10.5281/zenodo.1492613)</p>
+<ul>
+<li>the format of the data:</li>
+</ul>
+<p>“Running text files (.run), Part of Speech tagged files (.pos), and EAGLES tagged files (.eagles)”</p>
+</section>
+<section id="structure" class="level3">
+<h3 class="anchored" data-anchor-id="structure">Structure</h3>
+<ul>
+<li>the relevant directories and data files</li>
+</ul>
+<ol type="1">
+<li>Directories:</li>
+</ol>
+<p>‘data/original/actives’: This directory contains the downloaded and decompressed data files.</p>
+<ol start="2" type="1">
+<li>Data files:</li>
+</ol>
+<p>Running text files (.run) Part of Speech tagged files (.pos) EAGLES tagged files (.eagles)</p>
+<ul>
+<li>the metadata and/ or variables to be organized</li>
+</ul>
+<ol type="1">
+<li>Metadata:</li>
+</ol>
+<ul>
+<li><p>Resource name: “ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican, and Spanish productions (v.02)”</p></li>
+<li><p>Data source: URL (https://github.com/francojc/activ-es) and DOI (10.5281/zenodo.1492613)</p></li>
+<li><p>Data sampling frame: Spanish-language TV-film transcripts from Argentina, Mexico, and Spain</p></li>
+<li><p>Data collection date(s): 1940s-2010s</p></li>
+<li><p>Data format: Running text files (.run), Part of Speech tagged files (.pos), and EAGLES tagged files (.eagles)</p></li>
+<li><p>Data schema: File names reflect language code, country, year, title, type, genre (first genre listed in IMDb), and IMDb ID</p></li>
+<li><p>License: GNU General Public License v2.0</p></li>
+<li><p>Attribution: Jerid Francom. (2018).</p></li>
+<li><p>ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican, and Spanish productions (activ-es-v.02) [Data set]. Zenodo. (https://doi.org/10.5281/zenodo.1492613)</p></li>
+</ul>
+<ol start="2" type="1">
+<li>Variables:</li>
+</ol>
+<p>Language code Country Year Title Type Genre IMDb ID</p>
+<ul>
+<li>the relationships between the data elements</li>
+</ul>
+<p>The data elements likely have relationships based on their attributes. In the context of the “ACTIV-ES” dataset, these relationships might include:</p>
+<ul>
+<li><p>Each film or production can be associated with multiple dialogue transcripts.</p></li>
+<li><p>Attributes such as language code, country, year, title, type, genre, and IMDb ID are associated with each film or production.</p></li>
+<li><p>There could be associations between films from the same country, year, or genre.</p></li>
+<li><p>the idealized format for the curated dataset in a tabular format</p></li>
+</ul>
+<table class="table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Language Code</th>
+<th>Country</th>
+<th>Year</th>
+<th>Title</th>
+<th>Type</th>
+<th>Genre</th>
+<th>IMDb ID</th>
+<th>Dialogue Transcript File</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ES</td>
+<td>Argentina</td>
+<td>1995</td>
+<td>Example Movie 1</td>
+<td>Feature</td>
+<td>Drama</td>
+<td>tt123456789</td>
+<td>example_movie1_dialogue.run</td>
+</tr>
+<tr class="even">
+<td>ES</td>
+<td>Mexico</td>
+<td>2000</td>
+<td>Example Movie 2</td>
+<td>Feature</td>
+<td>Comedy</td>
+<td>tt987654321</td>
+<td>example_movie2_dialogue.run</td>
+</tr>
+<tr class="odd">
+<td>ES</td>
+<td>Spain</td>
+<td>2005</td>
+<td>Example Movie 3</td>
+<td>Short</td>
+<td>Romance</td>
+<td>tt246810121</td>
+<td>example_movie3_dialogue.run</td>
+</tr>
+</tbody>
+</table>
+<p>In this tabular format:</p>
+<ul>
+<li>Language Code: The code representing the language of the film.</li>
+<li>Country: The country where the film was produced.</li>
+<li>Year: The release year of the film.</li>
+<li>Title: The title of the film.</li>
+<li>Type: The type of film (e.g., feature, short).</li>
+<li>Genre: The genre of the film.</li>
+<li>IMDb ID: The IMDb identifier of the film.</li>
+<li>Dialogue Transcript File: The file containing the dialogue transcript associated with the film.</li>
+</ul>
+<p>This format allows for a structured representation of the dataset, making it easy to understand and analyze the characteristics of each film within the corpus. Each row represents a unique film, and each column provides specific attributes or metadata associated with that film.</p>
+</section>
+</section>
+<section id="curate" class="level2">
+<h2 class="anchored" data-anchor-id="curate">Curate</h2>
+<!-- Overview of the data curation process -->
+<p>data curation process:</p>
+<ul>
+<li><p>Data Collection: Gather the raw data from various sources.</p></li>
+<li><p>Data Cleaning: Remove errors, duplicates, and inconsistencies from the data.</p></li>
+<li><p>Data Integration: Combine data from different sources if needed.</p></li>
+<li><p>Data Transformation: Organize and structure the data for analysis.</p></li>
+<li><p>Data Validation: Check the data for accuracy and completeness.</p></li>
+<li><p>Data Documentation: Document the steps taken to clean and prepare the data.</p></li>
+<li><p>Data Storage: Store the curated data in a secure and accessible format.</p></li>
+<li><p>Data Sharing: Share the curated data with others for analysis or use.</p></li>
+</ul>
+<p>By following these steps, the data curation process ensures that the data is organized, reliable, and ready for analysis or other purposes.</p>
+<section id="read" class="level3">
+<h3 class="anchored" data-anchor-id="read">Read</h3>
+<!-- This code block reads data from the ACTIV-ES dataset. ... -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>doc_vars <span class="ot">&lt;-</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"lang"</span>, <span class="st">"country"</span>, <span class="st">"year"</span>, <span class="st">"title"</span>, <span class="st">"type"</span>, <span class="st">"genre"</span>, <span class="st">"imdbid"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>actives_tbl <span class="ot">&lt;-</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readtext</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"../data/original/actives/*.run"</span>, <span class="co">#</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarsfrom =</span> <span class="st">"filenames"</span>, <span class="co">#</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarnames =</span> doc_vars, <span class="co">#</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity =</span> <span class="dv">0</span> <span class="co">#</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="co">#</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>actives_tbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 430 × 9
+   doc_id                     text  lang  country  year title type  genre imdbid
+   &lt;chr&gt;                      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;
+ 1 es_Argentina_1950_Esposa-… "No … es    Argent…  1950 Espo… movie n     199500
+ 2 es_Argentina_1952_No-abra… "ALG… es    Argent…  1952 No-a… movie Myst… 184782
+ 3 es_Argentina_1955_El-amor… "Hab… es    Argent…  1955 El-a… movie Drama  47823
+ 4 es_Argentina_1965_Ocurrid… "Suc… es    Argent…  1965 Ocur… movie Docu… 282622
+ 5 es_Argentina_1969_La-veng… "10 … es    Argent…  1969 La-v… movie Horr…  62433
+ 6 es_Argentina_1973_Juan-Mo… "Y p… es    Argent…  1973 Juan… movie Adve…  70250
+ 7 es_Argentina_1975_Nazaren… "¡ J… es    Argent…  1975 Naza… movie Drama  71897
+ 8 es_Argentina_1977_Mastrop… "Ust… es    Argent…  1977 Mast… vide… Come… 333883
+ 9 es_Argentina_1979_Muchas-… "Mil… es    Argent…  1979 Much… vide… Come… 333954
+10 es_Argentina_1980_Tiro-al… "Y ?… es    Argent…  1980 Tiro… movie Drama 175243
+# ℹ 420 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="tidy" class="level3">
+<h3 class="anchored" data-anchor-id="tidy">Tidy</h3>
+<!-- This code block performs data tidying on the actives_tbl dataset. 
+It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>actives_tbl <span class="ot">&lt;-</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  actives_tbl <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">doc_id =</span> <span class="fu">row_number</span>() <span class="co">#</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>actives_tbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 430 × 9
+   doc_id text                      lang  country  year title type  genre imdbid
+    &lt;int&gt; &lt;chr&gt;                     &lt;chr&gt; &lt;chr&gt;   &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;
+ 1      1 "No está , señora . Aquí… es    Argent…  1950 Espo… movie n     199500
+ 2      2 "ALGUIEN AL TELÉFONO . L… es    Argent…  1952 No-a… movie Myst… 184782
+ 3      3 "Habrá que cumplir su úl… es    Argent…  1955 El-a… movie Drama  47823
+ 4      4 "Sucedió en Hualfin Esta… es    Argent…  1965 Ocur… movie Docu… 282622
+ 5      5 "10 secuestros en 10 día… es    Argent…  1969 La-v… movie Horr…  62433
+ 6      6 "Y preguntada que fue sí… es    Argent…  1973 Juan… movie Adve…  70250
+ 7      7 "¡ Jeremías ! ¡ Jeremías… es    Argent…  1975 Naza… movie Drama  71897
+ 8      8 "Usted . Usted que frecu… es    Argent…  1977 Mast… vide… Come… 333883
+ 9      9 "Miles de campanas nos t… es    Argent…  1979 Much… vide… Come… 333954
+10     10 "Y ? Enseguida viene , f… es    Argent…  1980 Tiro… movie Drama 175243
+# ℹ 420 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="write" class="level3">
+<h3 class="anchored" data-anchor-id="write">Write</h3>
+<!-- This code block saves the curated actives_tbl dataset as a CSV file named "actives_curated.csv" in the "../data/derived/" directory. ... -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> actives_tbl, <span class="co">#</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"../data/derived/actives_curated.csv"</span> <span class="co">#</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<!-- Overview of the purpose and structure of the documentation -->
+<p>This section gives an overview of why and how the “ACTIV-ES” dataset is documented.</p>
+<ul>
+<li><p>The purpose of the documentation is to:</p>
+<ul>
+<li>Explain what the dataset is about and where it comes from.</li>
+<li>Describe what information is included in the dataset.</li>
+<li>Help users understand how to access and use the dataset effectively.</li>
+<li>Document any changes or adjustments made to the dataset.</li>
+</ul></li>
+<li><p>The documentation is structured into:</p></li>
+</ul>
+<ol type="1">
+<li><p>Introduction: Provides background information on the dataset’s origin and importance.</p></li>
+<li><p>Data Description: Describes the dataset’s content, including its variables and what they represent.</p></li>
+<li><p>Accessing Data: Instructions on how users can access the dataset.</p></li>
+<li><p>Using the Data: Guidance on how to work with and interpret the dataset.</p></li>
+<li><p>Data Preparation: Details any cleaning or formatting done to the dataset.</p></li>
+<li><p>References: Lists sources and credits for the dataset.</p></li>
+</ol>
+<section id="data-dictionary" class="level3">
+<h3 class="anchored" data-anchor-id="data-dictionary">Data dictionary</h3>
+<!-- This code creates a simple data dictionary for the curated actives_tbl dataset and saves it as a CSV file named "actives_curated_dd.csv". ... -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_data_dictionary</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> actives_tbl, <span class="co">#</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_path =</span> <span class="st">"../data/derived/actives_curated_dd.csv"</span> <span class="co">#</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!--
+
+Note:
+
+You will need to open and edit the `actives_curated_dd.csv` file to add the descriptions for each variable.
+
+-->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"../data/derived/actives_curated_dd.csv"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tbl-data-dictionary-show" class="anchored">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Table&nbsp;2: Data dictionary: Actives corpus</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable_type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">doc_id</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">text</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lang</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">country</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">year</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">title</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">type</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">genre</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">imdbid</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+</div>
+</div>
+</section>
+</section>
+<section id="self-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="self-assessment">Self-assessment</h2>
+<section id="what-did-you-learn" class="level3">
+<h3 class="anchored" data-anchor-id="what-did-you-learn">What did you learn?</h3>
+<ul>
+<li><p>Through this exercise, I learned about the process of curating datasets, which involves steps such as data collection, cleaning, integration, transformation, validation, documentation, and storage.</p></li>
+<li><p>I also learned how to use R and Quarto Markdown to write code blocks and descriptions, making documentation clearer and more informative.</p></li>
+</ul>
+</section>
+<section id="what-did-you-find-most-least-challenging" class="level3">
+<h3 class="anchored" data-anchor-id="what-did-you-find-most-least-challenging">What did you find most/ least challenging?</h3>
+<ul>
+<li><p>The most challenging part was ensuring that the descriptions were concise yet informative, conveying the purpose and functionality of each code block effectively.</p></li>
+<li><p>The least challenging part was understanding the code itself, as I’m getting familiar with R and Markdown syntax.</p></li>
+</ul>
+</section>
+<section id="what-resources-did-you-consult" class="level3">
+<h3 class="anchored" data-anchor-id="what-resources-did-you-consult">What resources did you consult?</h3>
+<ul>
+<li>I referred to the R documentation for specific functions and packages used in the code blocks.
+<ul>
+<li><a href="https://www.rdocumentation.org/">R Documentation</a></li>
+</ul></li>
+</ul>
+</section>
+<section id="what-more-would-you-like-to-know-about-curating-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="what-more-would-you-like-to-know-about-curating-datasets">What more would you like to know about curating datasets?</h3>
+<ul>
+<li><p>I would like to explore more advanced techniques for data cleaning and transformation, especially for dealing with large and complex datasets. Additionally, I’m interested in learning about best practices for versioning and maintaining curated datasets over time to ensure data integrity and reproducibility.</p></li>
+<li><p>resources I might consult:</p>
+<ul>
+<li><p>A post from <a href="https://gist.github.com/BioSciEconomist/be83a5352c91c1e82a5d0846635fa483">GitHub</a></p></li>
+<li><p>Youtube video about <a href="https://www.youtube.com/watch?v=HZeL27QQsXY">data cleaning</a></p></li>
+<li><p>Youtube video about <a href="https://www.youtube.com/watch?v=R_rmnsjgvOQ">data transformation</a></p></li>
+</ul></li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,329 @@
+---
+title: "Lab 06: Taming data"
+author: "Lin Wang"
+format: html
+bibliography: ["../bibliography.bib", "../packages.bib"]
+---
+
+```{r}
+#| label: setup
+#| message: false
+
+library(dplyr)        # data manipulation
+library(knitr)        # dynamic report generation
+library(readtext)     # text data import
+library(readr)        # efficient data reading
+library(qtalrkit)     # document the dataset
+```
+
+```{r}
+#| label: acquire-data
+#| message: false
+#| echo: false
+#| eval: false
+
+#
+get_compressed_data(
+  url = "https://github.com/francojc/activ-es/raw/master/activ-es-v.02/corpus/plain.zip", # access and download the file named 'plain.zip'
+  target_dir = "../data/original/actives",  # the specific directory where the downloaded file will be saved
+  confirmed = TRUE
+)
+```
+
+## Data
+
+<!--
+
+- Overview of the data source and the purpose of this script
+
+-->
+
+### Description
+
+```{r}
+#| label: tbl-data-origin-file
+#| tbl-cap: "Data origin: Actives corpus"
+#| tbl-colwidths: [30, 70]
+#| message: false
+
+#
+read_csv("../data/original/actives_do.csv") |>
+  kable() #
+
+```
+
+- the name of the data: 
+
+"ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican and Spanish productions (v.02)"
+
+- the source of the data: 
+
+"URL: https://github.com/francojc/activ-es and DOI: 10.5281/zenodo.1492613"
+
+- the nature of the data: 
+
+Sampling frame is "Spanish-language TV-film transcripts from Argentina, Mexico, and Spain", data collection dates are "1940s-2010s"
+
+- the acquisition strategy that was used: 
+
+It involves downloading the data from the provided URL:(https://github.com/francojc/activ-es) and Zenodo DOI (10.5281/zenodo.1492613)
+
+- the format of the data: 
+
+"Running text files (.run), Part of Speech tagged files (.pos), and EAGLES tagged files (.eagles)"
+
+### Structure
+
+- the relevant directories and data files
+
+1. Directories:
+
+'data/original/actives': This directory contains the downloaded and decompressed data files.
+
+2. Data files:
+
+Running text files (.run)
+Part of Speech tagged files (.pos)
+EAGLES tagged files (.eagles)
+
+- the metadata and/ or variables to be organized
+
+1. Metadata:
+
+- Resource name: "ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from  Argentine, Mexican, and Spanish productions (v.02)"
+
+- Data source: URL (https://github.com/francojc/activ-es) and DOI (10.5281/zenodo.1492613)
+
+- Data sampling frame: Spanish-language TV-film transcripts from Argentina, Mexico, and Spain
+
+- Data collection date(s): 1940s-2010s
+
+- Data format: Running text files (.run), Part of Speech tagged files (.pos), and EAGLES tagged files (.eagles)
+
+- Data schema: File names reflect language code, country, year, title, type, genre (first genre listed in IMDb), and IMDb ID
+
+- License: GNU General Public License v2.0
+
+- Attribution: Jerid Francom. (2018). 
+
+- ACTIV-ES: a comparable Spanish corpus comprised of film dialogue from Argentine, Mexican, and Spanish productions (activ-es-v.02) [Data set]. Zenodo. (https://doi.org/10.5281/zenodo.1492613)
+
+2. Variables:
+
+Language code
+Country
+Year
+Title
+Type
+Genre
+IMDb ID
+
+- the relationships between the data elements
+
+The data elements likely have relationships based on their attributes. In the context of the "ACTIV-ES" dataset, these relationships might include:
+
+  - Each film or production can be associated with multiple dialogue transcripts.
+
+  - Attributes such as language code, country, year, title, type, genre, and IMDb ID are associated with each film or production.
+
+  - There could be associations between films from the same country, year, or genre.
+
+
+- the idealized format for the curated dataset in a tabular format
+
+| Language Code | Country   | Year | Title            | Type    | Genre    | IMDb ID      | Dialogue Transcript File                    |
+|---------------|-----------|------|------------------|---------|----------|--------------|---------------------------------------------|
+| ES            | Argentina | 1995 | Example Movie 1  | Feature | Drama    | tt123456789  | example_movie1_dialogue.run                 |
+| ES            | Mexico    | 2000 | Example Movie 2  | Feature | Comedy   | tt987654321  | example_movie2_dialogue.run                 |
+| ES            | Spain     | 2005 | Example Movie 3  | Short   | Romance  | tt246810121  | example_movie3_dialogue.run                 |
+
+
+In this tabular format:
+
+  - Language Code: The code representing the language of the film.
+  - Country: The country where the film was produced.
+  - Year: The release year of the film.
+  - Title: The title of the film.
+  - Type: The type of film (e.g., feature, short).
+  - Genre: The genre of the film.
+  - IMDb ID: The IMDb identifier of the film.
+  - Dialogue Transcript File: The file containing the dialogue transcript associated with the film.
+
+This format allows for a structured representation of the dataset, making it easy to understand and analyze the characteristics of each film within the corpus. Each row represents a unique film, and each column provides specific attributes or metadata associated with that film.
+
+## Curate
+
+<!-- Overview of the data curation process -->
+
+data curation process:
+
+- Data Collection: Gather the raw data from various sources.
+
+- Data Cleaning: Remove errors, duplicates, and inconsistencies from the data.
+
+- Data Integration: Combine data from different sources if needed.
+
+- Data Transformation: Organize and structure the data for analysis.
+
+- Data Validation: Check the data for accuracy and completeness.
+
+- Data Documentation: Document the steps taken to clean and prepare the data.
+
+- Data Storage: Store the curated data in a secure and accessible format.
+
+- Data Sharing: Share the curated data with others for analysis or use.
+
+By following these steps, the data curation process ensures that the data is organized, reliable, and ready for analysis or other purposes.
+
+### Read
+
+<!-- This code block reads data from the ACTIV-ES dataset. ... -->
+
+```{r}
+#| label: read-data-actives
+#| message: false
+
+#
+doc_vars <-
+  c("lang", "country", "year", "title", "type", "genre", "imdbid")
+
+#
+actives_tbl <-
+  #
+  readtext(
+    file = "../data/original/actives/*.run", #
+    docvarsfrom = "filenames", #
+    docvarnames = doc_vars, #
+    verbosity = 0 #
+  ) |>
+  as_tibble() #
+
+#
+actives_tbl
+```
+
+### Tidy
+
+<!-- This code block performs data tidying on the actives_tbl dataset. 
+It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
+
+```{r} 
+#| label: tidy-data-actives
+
+#
+actives_tbl <-
+  actives_tbl |>
+  mutate(
+    doc_id = row_number() #
+  )
+
+#
+actives_tbl
+```
+
+### Write
+
+<!-- This code block saves the curated actives_tbl dataset as a CSV file named "actives_curated.csv" in the "../data/derived/" directory. ... -->
+
+```{r}
+#| label: write-data-actives
+
+#
+write_csv(
+  x = actives_tbl, #
+  file = "../data/derived/actives_curated.csv" #
+)
+```
+
+## Documentation
+
+<!-- Overview of the purpose and structure of the documentation -->
+
+This section gives an overview of why and how the "ACTIV-ES" dataset is documented.
+
+- The purpose of the documentation is to:
+
+  - Explain what the dataset is about and where it comes from.
+  - Describe what information is included in the dataset.
+  - Help users understand how to access and use the dataset effectively.
+  - Document any changes or adjustments made to the dataset.
+
+- The documentation is structured into:
+
+1. Introduction: Provides background information on the dataset's origin and importance.
+
+2. Data Description: Describes the dataset's content, including its variables and what they represent.
+
+3. Accessing Data: Instructions on how users can access the dataset.
+
+4. Using the Data: Guidance on how to work with and interpret the dataset.
+
+5. Data Preparation: Details any cleaning or formatting done to the dataset.
+
+6. References: Lists sources and credits for the dataset.
+
+### Data dictionary
+
+<!-- This code creates a simple data dictionary for the curated actives_tbl dataset and saves it as a CSV file named "actives_curated_dd.csv". ... -->
+
+```{r}
+#| label: create-data-dictionary
+#| message: false
+
+#
+create_data_dictionary(
+  data = actives_tbl, #
+  file_path = "../data/derived/actives_curated_dd.csv" #
+)
+```
+
+<!--
+
+Note:
+
+You will need to open and edit the `actives_curated_dd.csv` file to add the descriptions for each variable.
+
+-->
+
+
+```{r}
+#| label: tbl-data-dictionary-show
+#| tbl-cap: "Data dictionary: Actives corpus"
+#| message: false
+
+#
+read_csv("../data/derived/actives_curated_dd.csv") |>
+  kable() #
+```
+
+## Self-assessment
+
+### What did you learn?
+
+- Through this exercise, I learned about the process of curating datasets, which involves steps such as data collection, cleaning, integration, transformation, validation, documentation, and storage.
+
+- I also learned how to use R and Quarto Markdown to write code blocks and descriptions, making documentation clearer and more informative.
+
+### What did you find most/ least challenging?
+
+- The most challenging part was ensuring that the descriptions were concise yet informative, conveying the purpose and functionality of each code block effectively.
+
+- The least challenging part was understanding the code itself, as I'm getting familiar with R and Markdown syntax.
+
+### What resources did you consult?
+
+- I referred to the R documentation for specific functions and packages used in the code blocks.
+  - [R Documentation](https://www.rdocumentation.org/)  
+  
+### What more would you like to know about curating datasets?
+
+- I would like to explore more advanced techniques for data cleaning and transformation, especially for dealing with large and complex datasets. Additionally, I'm interested in learning about best practices for versioning and maintaining curated datasets over time to ensure data integrity and reproducibility.
+
+- resources I might consult:
+
+  - A post from [GitHub](https://gist.github.com/BioSciEconomist/be83a5352c91c1e82a5d0846635fa483) 
+  
+  - Youtube video about [data cleaning](https://www.youtube.com/watch?v=HZeL27QQsXY)
+  
+  - Youtube video about [data transformation](https://www.youtube.com/watch?v=R_rmnsjgvOQ)
+

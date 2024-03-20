@@ -10,11 +10,11 @@ bibliography: ["../bibliography.bib", "../packages.bib"]
 #| label: setup
 #| message: false
 
-library(dplyr)        #
-library(knitr)        #
-library(readtext)     #
-library(readr)        #
-library(qtalrkit)     #
+library(dplyr)        # data manipulation
+library(knitr)        # dynamic report generation
+library(readtext)     # text data import
+library(readr)        # efficient data reading
+library(qtalrkit)     # document the dataset
 ```
 
 ```{r}
@@ -29,6 +29,8 @@ get_compressed_data(
   target_dir = "data/original/actives" #
 )
 ```
+
+
 
 ## Data
 
