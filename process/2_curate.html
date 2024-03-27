@@ -118,9 +118,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the CSV file</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"../data/original/actives_do.csv"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span> () <span class="co"># Display the data as a table using kable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="tbl-data-origin-file" class="anchored">
 <table data-quarto-postprocess="true" data-tbl-colwidths="[30,70]" class="table table-sm table-striped small">
@@ -204,9 +204,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol start="2" type="1">
 <li>Data files:</li>
 </ol>
-<p>Running text files (.run) Part of Speech tagged files (.pos) EAGLES tagged files (.eagles)</p>
 <ul>
-<li>the metadata and/ or variables to be organized</li>
+<li><p>Running text files (.run)</p></li>
+<li><p>Part of Speech tagged files (.pos)</p></li>
+<li><p>EAGLES tagged files (.eagles)</p></li>
+<li><p>the metadata and/ or variables to be organized</p></li>
 </ul>
 <ol type="1">
 <li>Metadata:</li>
@@ -225,9 +227,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol start="2" type="1">
 <li>Variables:</li>
 </ol>
-<p>Language code Country Year Title Type Genre IMDb ID</p>
 <ul>
-<li>the relationships between the data elements</li>
+<li><p>Language code</p></li>
+<li><p>Country</p></li>
+<li><p>Year</p></li>
+<li><p>Title</p></li>
+<li><p>Type</p></li>
+<li><p>Genre</p></li>
+<li><p>IMDb ID</p></li>
+<li><p>the relationships between the data elements</p></li>
 </ul>
 <p>The data elements likely have relationships based on their attributes. In the context of the “ACTIV-ES” dataset, these relationships might include:</p>
 <ul>
@@ -309,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="curate" class="level2">
 <h2 class="anchored" data-anchor-id="curate">Curate</h2>
 <!-- Overview of the data curation process -->
-<p>data curation process:</p>
+<p>Data curation process:</p>
 <ul>
 <li><p>Data Collection: Gather the raw data from various sources.</p></li>
 <li><p>Data Cleaning: Remove errors, duplicates, and inconsistencies from the data.</p></li>
@@ -325,22 +333,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="read">Read</h3>
 <!-- This code block reads data from the ACTIV-ES dataset. ... -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Defines document variable names</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>doc_vars <span class="ot">&lt;-</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"lang"</span>, <span class="st">"country"</span>, <span class="st">"year"</span>, <span class="st">"title"</span>, <span class="st">"type"</span>, <span class="st">"genre"</span>, <span class="st">"imdbid"</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Read text files, extracting document variables and loading data into a tibble</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>actives_tbl <span class="ot">&lt;-</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  Read text data from files into R</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readtext</span>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"../data/original/actives/*.run"</span>, <span class="co">#</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarsfrom =</span> <span class="st">"filenames"</span>, <span class="co">#</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarnames =</span> doc_vars, <span class="co">#</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity =</span> <span class="dv">0</span> <span class="co">#</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"../data/original/actives/*.run"</span>, <span class="co"># Specify the path to the directory containing text files</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarsfrom =</span> <span class="st">"filenames"</span>, <span class="co"># Indicate document variables should be extracted from filenames</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">docvarnames =</span> doc_vars, <span class="co"># Specify names of document variables</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity =</span> <span class="dv">0</span> <span class="co"># Control verbosity during reading</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="co">#</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="co"># Convert output to a tibble format</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  This line creates a table with the text from the files and information about each file</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>actives_tbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 430 × 9
@@ -369,10 +377,10 @@ It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>actives_tbl <span class="ot">&lt;-</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  actives_tbl <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">doc_id =</span> <span class="fu">row_number</span>() <span class="co">#</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">doc_id =</span> <span class="fu">row_number</span>() <span class="co"># This line creates a new column called doc_id and assigns to each row a unique identifier based on its position in the tibble</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Refers to the existing tibble named 'actives_tbl'</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>actives_tbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 430 × 9
@@ -396,10 +404,10 @@ It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
 <h3 class="anchored" data-anchor-id="write">Write</h3>
 <!-- This code block saves the curated actives_tbl dataset as a CSV file named "actives_curated.csv" in the "../data/derived/" directory. ... -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write data frames or tibbles to CSV files</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> actives_tbl, <span class="co">#</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"../data/derived/actives_curated.csv"</span> <span class="co">#</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> actives_tbl, <span class="co"># Specify the data to be written, in this case, the actives_tbl tibble</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"../data/derived/actives_curated.csv"</span> <span class="co"># Specify the path and filename where the CSV file will be saved</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -430,10 +438,10 @@ It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
 <h3 class="anchored" data-anchor-id="data-dictionary">Data dictionary</h3>
 <!-- This code creates a simple data dictionary for the curated actives_tbl dataset and saves it as a CSV file named "actives_curated_dd.csv". ... -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  Take the data (actives_tbl) and generate a data dictionary.</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_data_dictionary</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> actives_tbl, <span class="co">#</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_path =</span> <span class="st">"../data/derived/actives_curated_dd.csv"</span> <span class="co">#</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> actives_tbl, <span class="co"># Specify the data for which the data dictionary will be created</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_path =</span> <span class="st">"../data/derived/actives_curated_dd.csv"</span> <span class="co"># Specify the path and filename where the data dictionary CSV file will be saved</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!--
@@ -444,9 +452,9 @@ You will need to open and edit the `actives_curated_dd.csv` file to add the desc
 
 -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the CSV file containing the data dictionary using the read_csv() function from the readr package.</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"../data/derived/actives_curated_dd.csv"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="co">#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="co"># Generate a Markdown-formatted table from the data frame</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="tbl-data-dictionary-show" class="anchored">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
@@ -552,7 +560,7 @@ You will need to open and edit the `actives_curated_dd.csv` file to add the desc
 <h3 class="anchored" data-anchor-id="what-more-would-you-like-to-know-about-curating-datasets">What more would you like to know about curating datasets?</h3>
 <ul>
 <li><p>I would like to explore more advanced techniques for data cleaning and transformation, especially for dealing with large and complex datasets. Additionally, I’m interested in learning about best practices for versioning and maintaining curated datasets over time to ensure data integrity and reproducibility.</p></li>
-<li><p>resources I might consult:</p>
+<li><p>Resources I consulted:</p>
 <ul>
 <li><p>A post from <a href="https://gist.github.com/BioSciEconomist/be83a5352c91c1e82a5d0846635fa483">GitHub</a></p></li>
 <li><p>Youtube video about <a href="https://www.youtube.com/watch?v=HZeL27QQsXY">data cleaning</a></p></li>

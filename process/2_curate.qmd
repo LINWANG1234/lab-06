@@ -46,9 +46,9 @@ get_compressed_data(
 #| tbl-colwidths: [30, 70]
 #| message: false
 
-#
+# Read the CSV file
 read_csv("../data/original/actives_do.csv") |>
-  kable() #
+  kable () # Display the data as a table using kable
 
 ```
 
@@ -82,9 +82,9 @@ It involves downloading the data from the provided URL:(https://github.com/franc
 
 2. Data files:
 
-Running text files (.run)
-Part of Speech tagged files (.pos)
-EAGLES tagged files (.eagles)
+  - Running text files (.run)
+  - Part of Speech tagged files (.pos)
+  - EAGLES tagged files (.eagles)
 
 - the metadata and/ or variables to be organized
 
@@ -110,13 +110,13 @@ EAGLES tagged files (.eagles)
 
 2. Variables:
 
-Language code
-Country
-Year
-Title
-Type
-Genre
-IMDb ID
+  - Language code
+  - Country
+  - Year
+  - Title
+  - Type
+  - Genre
+  - IMDb ID
 
 - the relationships between the data elements
 
@@ -155,7 +155,7 @@ This format allows for a structured representation of the dataset, making it eas
 
 <!-- Overview of the data curation process -->
 
-data curation process:
+Data curation process:
 
 - Data Collection: Gather the raw data from various sources.
 
@@ -183,22 +183,22 @@ By following these steps, the data curation process ensures that the data is org
 #| label: read-data-actives
 #| message: false
 
-#
+# Defines document variable names
 doc_vars <-
   c("lang", "country", "year", "title", "type", "genre", "imdbid")
 
-#
+# Read text files, extracting document variables and loading data into a tibble
 actives_tbl <-
-  #
+  #  Read text data from files into R
   readtext(
-    file = "../data/original/actives/*.run", #
-    docvarsfrom = "filenames", #
-    docvarnames = doc_vars, #
-    verbosity = 0 #
+    file = "../data/original/actives/*.run", # Specify the path to the directory containing text files
+    docvarsfrom = "filenames", # Indicate document variables should be extracted from filenames
+    docvarnames = doc_vars, # Specify names of document variables
+    verbosity = 0 # Control verbosity during reading
   ) |>
-  as_tibble() #
+  as_tibble() # Convert output to a tibble format
 
-#
+#  This line creates a table with the text from the files and information about each file
 actives_tbl
 ```
 
@@ -214,10 +214,10 @@ It is part of the data processing pipeline for the "ACTIV-ES" dataset.... -->
 actives_tbl <-
   actives_tbl |>
   mutate(
-    doc_id = row_number() #
+    doc_id = row_number() # This line creates a new column called doc_id and assigns to each row a unique identifier based on its position in the tibble
   )
 
-#
+# Refers to the existing tibble named 'actives_tbl'
 actives_tbl
 ```
 
@@ -228,10 +228,10 @@ actives_tbl
 ```{r}
 #| label: write-data-actives
 
-#
+# Write data frames or tibbles to CSV files
 write_csv(
-  x = actives_tbl, #
-  file = "../data/derived/actives_curated.csv" #
+  x = actives_tbl, # Specify the data to be written, in this case, the actives_tbl tibble
+  file = "../data/derived/actives_curated.csv" # Specify the path and filename where the CSV file will be saved
 )
 ```
 
@@ -270,10 +270,10 @@ This section gives an overview of why and how the "ACTIV-ES" dataset is document
 #| label: create-data-dictionary
 #| message: false
 
-#
+#  Take the data (actives_tbl) and generate a data dictionary.
 create_data_dictionary(
-  data = actives_tbl, #
-  file_path = "../data/derived/actives_curated_dd.csv" #
+  data = actives_tbl, # Specify the data for which the data dictionary will be created
+  file_path = "../data/derived/actives_curated_dd.csv" # Specify the path and filename where the data dictionary CSV file will be saved
 )
 ```
 
@@ -291,9 +291,9 @@ You will need to open and edit the `actives_curated_dd.csv` file to add the desc
 #| tbl-cap: "Data dictionary: Actives corpus"
 #| message: false
 
-#
+# Read the CSV file containing the data dictionary using the read_csv() function from the readr package.
 read_csv("../data/derived/actives_curated_dd.csv") |>
-  kable() #
+  kable() # Generate a Markdown-formatted table from the data frame
 ```
 
 ## Self-assessment
@@ -319,7 +319,7 @@ read_csv("../data/derived/actives_curated_dd.csv") |>
 
 - I would like to explore more advanced techniques for data cleaning and transformation, especially for dealing with large and complex datasets. Additionally, I'm interested in learning about best practices for versioning and maintaining curated datasets over time to ensure data integrity and reproducibility.
 
-- resources I might consult:
+- Resources I consulted:
 
   - A post from [GitHub](https://gist.github.com/BioSciEconomist/be83a5352c91c1e82a5d0846635fa483) 
   
